@@ -1,10 +1,23 @@
-const express = require("express");
+import dotenv from "dotenv";
+import express from "express";
+import wordsRouter from "./routes/get1000Words.js";
+import initializeDatabase from "./controllers/dbController.js";
+
+dotenv.config();
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-const MostCommonWords = require("thousand-most-common-words");
-const allCodes = MostCommonWords.getAllLanguageCodes();
+(async () => {
+  try {
+    await initializeDatabase();
+    app.use("/api", wordsRouter);
 
-app.get("/", (req, res) => {
-  res.send(allCodes);
-});
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to start the server:", error);
+    process.exit(1);
+  }
+})();
